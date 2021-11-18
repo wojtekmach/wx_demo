@@ -25,7 +25,11 @@ defmodule WxDemo.Window do
 
     wx = :wx.new()
     frame = :wxFrame.new(wx, -1, title)
-    fixup_macos_menubar(frame, title)
+
+    if macOS?() do
+      fixup_macos_menubar(frame, title)
+    end
+
     :wxFrame.show(frame)
     :wxFrame.connect(frame, :command_menu_selected)
     :wxFrame.connect(frame, :close_window, skip: true)
@@ -83,5 +87,9 @@ defmodule WxDemo.Window do
         :wxMenu.delete(menu, item)
       end
     end
+  end
+
+  defp macOS?() do
+    :os.type() == {:unix, :darwin}
   end
 end
