@@ -23,11 +23,50 @@ defmodule AppBuilder do
     logo_path = options[:logo_path] || Application.app_dir(:wx, "examples/demo/erlang.png")
     create_logo(app_bundle_path, logo_path)
 
-    if info_plist = options[:info_plist] do
-      File.write!(Path.join([app_bundle_path, "Contents", "Info.plist"]), info_plist)
-    end
+    info_plist = options[:info_plist] || build_info_plist(options)
+    File.write!(Path.join([app_bundle_path, "Contents", "Info.plist"]), info_plist)
 
     release
+  end
+
+  defp build_info_plist(options) do
+    app_name = Keyword.fetch!(options, :name)
+
+    url_scheme =
+      if scheme = options[:url_scheme] do
+        """
+        \n<key>CFBundleURLTypes</key>
+        <array>
+        <dict>
+          <key>CFBundleURLName</key>
+          <string>#{app_name}</string>
+          <key>CFBundleURLSchemes</key>
+          <array>
+            <string>#{scheme}</string>
+          </array>
+        </dict>
+        </array>\
+        """
+      end
+
+    """
+    <?xml version="1.0" encoding="UTF-8"?>
+    <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+    <plist version="1.0">
+    <dict>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>CFBundleName</key>
+    <string>#{app_name}</string>
+    <key>CFBundleDisplayName</key>
+    <string>#{app_name}</string>
+    <key>CFBundleIconFile</key>
+    <string>AppIcon</string>
+    <key>CFBundleIconName</key>
+    <string>AppIcon</string>#{url_scheme}
+    </dict>
+    </plist>
+    """
   end
 
   defp create_logo(app_bundle_path, logo_source_path) do

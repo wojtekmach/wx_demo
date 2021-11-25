@@ -33,35 +33,7 @@ defmodule WxDemo.MixProject do
           :assemble,
           &AppBuilder.create_mac_app(&1,
             name: "WxDemo",
-            info_plist: """
-            <?xml version="1.0" encoding="UTF-8"?>
-            <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-            <plist version="1.0">
-            <dict>
-              <key>CFBundlePackageType</key>
-              <string>APPL</string>
-              <key>CFBundleName</key>
-              <string>WxDemo</string>
-              <key>CFBundleDisplayName</key>
-              <string>WxDemo</string>
-              <key>CFBundleIconFile</key>
-              <string>AppIcon</string>
-              <key>CFBundleIconName</key>
-              <string>AppIcon</string>
-              <key>CFBundleURLTypes</key>
-              <array>
-                <dict>
-                  <key>CFBundleURLName</key>
-                  <string>wxdemo</string>
-                  <key>CFBundleURLSchemes</key>
-                  <array>
-                    <string>wxdemo</string>
-                  </array>
-                </dict>
-              </array>
-            </dict>
-            </plist>
-            """
+            url_scheme: "wxdemo"
           )
         ]
       ]
