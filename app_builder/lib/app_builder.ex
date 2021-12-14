@@ -30,7 +30,7 @@ defmodule AppBuilder do
 
     if codesign = options[:codesign] do
       identity = Keyword.fetch!(codesign, :identity)
-      :os.cmd('codesign --verbose=4 --sign="#{identity}" #{dmg_path}')
+      {_, 0} = System.shell("codesign --verbose=4 --sign=\"#{identity}\" #{dmg_path}")
     end
 
     File.rm!(tmp_dmg_path)
