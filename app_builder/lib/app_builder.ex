@@ -9,21 +9,31 @@ defmodule AppBuilder do
     arch = :erlang.system_info(:system_architecture) |> to_string |> String.split("-") |> hd()
     vsn = release.version
     basename = "#{app_name}-#{vsn}-#{arch}.dmg"
-    IO.puts(">> creating tmp/dmg/#{basename}")
+
+    tmp_dmg_path = "tmp/#{app_name}.dmg"
+    dmg_path = "#{Mix.Project.build_path()}/rel/#{basename}"
+
+    File.rm_rf!(tmp_dmg_path)
+    File.rm_rf!(dmg_path)
+
+    IO.puts(">> creating #{dmg_path}")
 
     cmd!(
       "hdiutil",
-      ~w(create tmp/#{app_name}.dmg -ov -volname #{app_name}Install -fs HFS+ -srcfolder tmp/dmg)
+      ~w(create #{tmp_dmg_path} -ov -volname #{app_name}Install -fs HFS+ -srcfolder tmp/dmg)
     )
-
-    File.rm!("#{Mix.Project.build_path()}/rel/#{basename}")
 
     cmd!(
       "hdiutil",
-      ~w(convert tmp/#{app_name}.dmg -format UDZO -o #{Mix.Project.build_path()}/rel/#{basename})
+      ~w(convert #{tmp_dmg_path} -format UDZO -o #{dmg_path})
     )
 
-    File.rm!("tmp/#{app_name}.dmg")
+    if codesign = options[:codesign] do
+      identity = Keyword.fetch!(codesign, :identity)
+      :os.cmd('codesign --verbose=4 --sign="#{identity}" #{dmg_path}')
+    end
+
+    File.rm!(tmp_dmg_path)
     release
   end
 
@@ -34,7 +44,8 @@ defmodule AppBuilder do
         :launcher_script,
         :logo_path,
         :info_plist,
-        :url_scheme
+        :url_scheme,
+        :codesign
       ])
 
     app_name = Keyword.fetch!(options, :name)

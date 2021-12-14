@@ -26,23 +26,30 @@ defmodule WxDemo.MixProject do
   end
 
   defp releases do
-    app_builder_options = [
+    options = [
       name: "WxDemo",
       url_scheme: "wxdemo"
     ]
 
+    mac_app_dmg_options =
+      [
+        codesign: [
+          identity: System.fetch_env!("DEVELOPER_ID")
+        ]
+      ] ++ options
+
     [
       mac_app: [
         include_executables_for: [:unix],
-        steps: [:assemble, &AppBuilder.create_mac_app(&1, app_builder_options)]
+        steps: [:assemble, &AppBuilder.create_mac_app(&1, options)]
       ],
       mac_app_dmg: [
         include_executables_for: [:unix],
-        steps: [:assemble, &AppBuilder.create_mac_app_dmg(&1, app_builder_options)]
+        steps: [:assemble, &AppBuilder.create_mac_app_dmg(&1, mac_app_dmg_options)]
       ],
       windows_installer: [
         include_executables_for: [:windows],
-        steps: [:assemble, &AppBuilder.create_windows_installer(&1, app_builder_options)]
+        steps: [:assemble, &AppBuilder.create_windows_installer(&1, options)]
       ]
     ]
   end
