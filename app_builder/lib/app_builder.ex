@@ -30,7 +30,7 @@ defmodule AppBuilder do
 
     if codesign = options[:codesign] do
       identity = Keyword.fetch!(codesign, :identity)
-      {_, 0} = System.shell("codesign --verbose=4 --sign=\"#{identity}\" #{dmg_path}")
+      shell!("codesign --verbose=4 --sign=\"#{identity}\" #{dmg_path}")
     end
 
     File.rm!(tmp_dmg_path)
@@ -264,6 +264,10 @@ defmodule AppBuilder do
 
   defp cmd!(bin, args, opts \\ []) do
     {_, 0} = System.cmd(bin, args, [into: IO.stream()] ++ opts)
+  end
+
+  defp shell!(command, opts \\ []) do
+    {_, 0} = System.shell(command, opts)
   end
 
   # TODO: use Keyword.validate! when we require Elixir 1.13
